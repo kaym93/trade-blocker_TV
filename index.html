@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Blocker - Stop Revenge Trading Forever</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0e27;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        header {
+            padding: 20px 40px;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 68, 68, 0.2);
+        }
+        
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff4444;
+        }
+        
+        .cta-button-nav {
+            background: #ff4444;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .cta-button-nav:hover {
+            background: #ff6666;
+            transform: translateY(-2px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 120px 40px 80px;
+            text-align: center;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            position: relative;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,68,68,0.05)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            pointer-events: none;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 68, 68, 0.3);
+        }
+        
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #ffffff 0%, #ff4444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            color: #a0a0b0;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        /* Demo Section */
+        .demo-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #1a1f3a;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 68, 68, 0.2);
+        }
+        
+        .demo-header {
+            background: #2a2f4a;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .demo-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5555;
+        }
+        
+        .demo-dot:nth-child(2) { background: #ffbb33; }
+        .demo-dot:nth-child(3) { background: #00dd55; }
+        
+        .demo-image {
+            width: 100%;
+            border-radius: 0 0 10px 10px;
+            margin-top: 10px;
+        }
+        
+        .demo-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 100px;
+            padding: 40px;
+            background: #0f1329;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        
+        .trade-button {
+            position: relative;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: not-allowed;
+            transition: all 0.3s;
+        }
+        
+        .buy-button {
+            background: #00c853;
+            color: white;
+        }
+        
+        .sell-button {
+            background: #ff3333;
+            color: white;
+        }
+        
+        .blocked-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,0,0,0.9), rgba(139,0,0,0.9));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 1; }
+        }
+        
+        /* Email Capture */
+        .email-capture {
+            margin: 40px auto;
+            max-width: 500px;
+        }
+        
+        .email-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .email-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid rgba(255, 68, 68, 0.3);
+            background: rgba(26, 31, 58, 0.5);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .email-input::placeholder {
+            color: #666;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, #ff4444, #ff6666);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 68, 68, 0.3);
+        }
+        
+        .privacy-note {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 80px 40px;
+            background: #0f1329;
+        }
+        
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 50px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: #1a1f3a;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 68, 68, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 68, 68, 0.3);
+        }
+        
+        .feature-icon {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #ff4444;
+        }
+        
+        .feature-description {
+            color: #a0a0b0;
+            line-height: 1.6;
+        }
+        
+        /* Problems Section */
+        .problems {
+            padding: 80px 40px;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+        }
+        
+        .problem-list {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .problem-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255, 68, 68, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 68, 68, 0.1);
+        }
+        
+        .problem-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            color: #ff4444;
+        }
+        
+        .problem-text {
+            flex: 1;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        /* Testimonial */
+        .testimonial {
+            padding: 80px 40px;
+            background: #0f1329;
+            text-align: center;
+        }
+        
+        .testimonial-box {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #1a1f3a;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 68, 68, 0.2);
+        }
+        
+        .quote {
+            font-size: 20px;
+            line-height: 1.6;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .author {
+            color: #ff4444;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        footer {
+            padding: 40px;
+            text-align: center;
+            background: #0a0e27;
+            border-top: 1px solid rgba(255, 68, 68, 0.1);
+        }
+        
+        .footer-links {
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #ff4444;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+            
+            .subtitle {
+                font-size: 18px;
+            }
+            
+            .demo-buttons {
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .trade-button {
+                padding: 12px 25px;
+                font-size: 16px;
+            }
+            
+            .email-form {
+                flex-direction: column;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Success Message */
+        .success-message {
+            display: none;
+            background: rgba(0, 255, 100, 0.1);
+            border: 1px solid rgba(0, 255, 100, 0.3);
+            color: #00ff64;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">🛡️ Trade Blocker</div>
+            <a href="#signup" class="cta-button-nav">Get Early Access</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="badge">For TradingView Users</div>
+            <h1>Stop Revenge Trading Forever</h1>
+            <p class="subtitle">
+                A Chrome extension that physically blocks your trade buttons when you break your rules. 
+                No more blown accounts. No more emotional trading. Just enforced discipline.
+            </p>
+            
+            <!-- Demo -->
+            <div class="demo-container">
+                <div class="demo-header">
+                    <div class="demo-dot"></div>
+                    <div class="demo-dot"></div>
+                    <div class="demo-dot"></div>
+                    <span style="margin-left: 10px; color: #666;">TradingView.com</span>
+                </div>
+                <div class="demo-buttons">
+                    <button class="trade-button buy-button">
+                        BUY
+                        <div class="blocked-overlay">🔒 BLOCKED</div>
+                    </button>
+                    <button class="trade-button sell-button">
+                        SELL
+                        <div class="blocked-overlay">🔒 BLOCKED</div>
+                    </button>
+                </div>
+                <p style="text-align: center; color: #ff4444; margin-top: 20px; font-weight: bold;">
+                    "Max daily loss reached: $500"
+                </p>
+            </div>
+            
+            <!-- Email Capture -->
+            <div class="email-capture" id="signup">
+                <form class="email-form" id="emailForm">
+                    <input 
+                        type="email" 
+                        class="email-input" 
+                        placeholder="Enter your email" 
+                        required
+                        id="emailInput"
+                    >
+                    <button type="submit" class="cta-button">
+                        Get Early Access
+                    </button>
+                </form>
+                <p class="privacy-note">
+                    🔒 Join 50+ traders. Get 50% off lifetime access. No spam.
+                </p>
+                <div class="success-message" id="successMessage">
+                    ✅ Success! Check your email for early access details.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problems Section -->
+    <section class="problems">
+        <div class="features-container">
+            <h2 class="section-title">Sound Familiar?</h2>
+            <div class="problem-list">
+                <div class="problem-item">
+                    <span class="problem-icon">😤</span>
+                    <span class="problem-text">You hit your stop loss, then immediately enter another trade to "make it back"</span>
+                </div>
+                <div class="problem-item">
+                    <span class="problem-icon">📉</span>
+                    <span class="problem-text">One bad trade turns into 10, destroying weeks of profits in minutes</span>
+                </div>
+                <div class="problem-item">
+                    <span class="problem-icon">🎯</span>
+                    <span class="problem-text">You have solid rules but can't follow them when emotions run high</span>
